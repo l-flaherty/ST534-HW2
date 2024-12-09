@@ -1,0 +1,406 @@
+\documentclass[12pt, letterpaper]{article}
+\usepackage[left=2.5cm,right=2.5cm, top=2.5cm, bottom=2.5cm]{geometry}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead[R]{Flaherty, \thepage}
+\renewcommand{\headrulewidth}{2pt}
+\setlength{\headheight}{15pt}
+\usepackage{lipsum}
+\usepackage{amsmath}
+\usepackage[makeroom]{cancel}
+\usepackage{cancel}
+\usepackage{array,polynom}
+\newcolumntype{C}{>{{}}c<{{}}} % for '+' and '-' symbols
+\newcolumntype{R}{>{\displaystyle}r} % automatic display-style math mode 
+\usepackage{xcolor}
+\newcommand\Ccancel[2][black]{\renewcommand\CancelColor{\color{#1}}\cancel{#2}}
+% Define a custom environment for examples with an indent
+
+\newenvironment{ex}{
+	\par\smallskip % Add some vertical space before the example
+	\noindent\textit{Example:\hspace{-0.25em}}
+	\leftskip=0.5em % Set the left indent to 1em (adjust as needed)
+}{
+	\par\smallskip % Add some vertical space after the example
+	\leftskip=0em % Reset the left indent
+}
+
+\newenvironment{nonex}{
+	\par\smallskip % Add some vertical space before the example
+	\noindent\textit{Non-example:\hspace{-0.25em}}
+	\leftskip=0.5em % Set the left indent to 1em (adjust as needed)
+}{
+	\par\smallskip % Add some vertical space after the example
+	\leftskip=0em % Reset the left indent
+}
+\newcommand{\mymatrix}[1]{
+	\renewcommand{\arraystretch}{0.5} % Adjust vertical spacing%
+	\setlength\arraycolsep{3pt}       % Adjust horizontal spacing%
+	\scalebox{0.90}{                  % Change font size%
+		$\begin{bmatrix}
+			#1
+		\end{bmatrix}$
+	}                   
+	\renewcommand{\arraystretch}{1.0} % Reset vertical spacing
+	\setlength\arraycolsep{6pt}       %Adjust horizontal spacing%
+}
+
+\usepackage{amssymb}
+\usepackage{bbm}
+\usepackage{mathrsfs}
+\usepackage[toc]{glossaries}
+\usepackage{amsthm}
+\usepackage{indentfirst}
+\usepackage[utf8]{inputenc}
+\usepackage[thinc]{esdiff}
+\usepackage{graphicx}
+\graphicspath{{./images/}}
+\usepackage{subfig}
+\usepackage{chngcntr}
+\usepackage{placeins}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{comment}
+\usepackage{sectsty}
+\sectionfont{\fontsize{15}{15}\selectfont}
+\usepackage{subcaption}
+\setlength\abovedisplayskip{0pt}
+\usepackage[hidelinks]{hyperref}
+\usepackage[nottoc,numbib]{tocbibind}
+\renewcommand{\qedsymbol}{\rule{0.7em}{0.7em}}
+\newcommand{\Mod}[1]{\ (\mathrm{mod}\ #1)}
+\counterwithin{figure}{section}
+\usepackage{centernot}
+\usepackage{enumitem}
+\theoremstyle{definition}
+\newtheorem{exmp}{Example}
+\newtheorem{nonexmp}{Non-Example}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{lemma}{Lemma}[theorem]
+\numberwithin{equation}{section}
+\newcommand{\mydef}[1]{(Definition \ref{#1}, Page \pageref{#1})}
+\newcommand{\mytheorem}[1]{(Theorem \ref{#1}, Page \pageref{#1})}
+\newcommand{\mylemma}[1]{(Lemma \ref{#1}, Page \pageref{#1})}
+\newcommand{\clickableword}[2]{\hyperref[#1]{#2}}
+
+%underscript for operations%
+\newcommand{\+}[1]{+_{\scalebox{.375}{#1}}}
+\newcommand{\mult}[1]{\cdot_{\scalebox{.375}{#1}}}
+
+%blackboard for letters%
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\K}{\mathbb{K}}
+\newcommand{\1}{\mathbbm{1}}
+
+\title{Time Series HW \# 2}
+\author{Liam Flaherty}
+\date{\parbox{\linewidth}{\centering%
+		Professor Martin\endgraf\bigskip
+		NCSU: ST546-001\endgraf\bigskip
+		September 13, 2024 \endgraf}}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\newpage\clearpage\noindent
+
+
+\noindent\textbf{1) \boldmath{Consider the time series
+		\begin{align*}
+			\text{Model 1: }& Z_t=a_t+0.5a_{t-1}+0.24a_{t-2}\\
+			\text{Model 2: }& Z_t=0.8Z_{t-1}+a_t-0.3a_{t-1}
+		\end{align*}}}
+
+\noindent\textbf{\boldmath{a. Simulate data of lengths 50 and 1000 for the models. Use a burn-in period of length 101 ($t=-100$ to 0) before outputting data from the model.}}
+\vspace{\baselineskip}
+
+We can use the \texttt{arima.sim()} command from R. The below script gives us our simulation:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=12cm]{ARIMAsim}	
+\end{figure}
+
+And this code results in output like the below:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=15cm]{ARIMAsim Output}
+\end{figure}
+
+
+
+
+\newpage
+\noindent\textbf{\boldmath{b. Use software to produce plots of the simulated time series, and the estimated autocorrelation (ACF) and partial autocorrelation (PACF) functions.}}
+\vspace{\baselineskip}
+
+We can plot the simulated data and estimated ACF and PACF functions. The full script is in the appendix, but the gist is below.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm]{ACF Code}
+\end{figure}
+
+
+The output for the four models are shown below. Note that with smaller sample sizes, the estimated ACF and PACF is not as reliable. For example, the ACF of the MA(2) model spikes at lags out to 10 when there is only 50 data points, whereas with more data, the ACF seems to cut off after the second lag, as would be expected theoretically.
+
+\vspace{-0.5cm}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm]{ARIMA Plot Short1}
+\end{figure}
+\vspace{-0.5cm}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm]{ARIMA Plot Long1}
+\end{figure}
+\vspace{-1cm}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm]{ARIMA Plot Short2}
+\end{figure}
+\vspace{-1cm}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm]{ARIMA Plot Long2}
+\end{figure}
+
+
+\vspace{\baselineskip}
+\noindent\textbf{\boldmath{c. Show whether or not the model is stationary, and whether or not the model is invertible. If the model is stationary, do the following: }}
+\vspace{\baselineskip}
+
+The MA representation of a model, say $\tilde{Z}_t=\sum\limits_{j=0}^{\infty}\psi_ja_{t-j}=\psi(B)a_t$, is stationary when $\sum\limits_{j=0}^{\infty}|\psi_j|<\infty$. It is invertible when the roots of $\psi(B)$ lie outside the unit circle. Similarly, the AR representation of a model, say $\tilde{Z}_t=a_t+\sum\limits_{1=0}^{\infty}\pi_jZ_{t-j} \implies \pi(B)\tilde{Z}_t=a_t$, is invertible when $\sum\limits_{1=0}^{\infty}|\pi_j|<\infty$. It is stationary when the roots of $\pi(B)$ lie outside the unit circle. Logically, an ARMA model $\pi(B)\tilde{Z}_t=\psi(B)a_t$ is stationary when the roots of $\psi(B)$ lie outside the unit circle, and invertible when the roots of $\pi(B)$ lie outside the unit circle.
+\vspace{\baselineskip}
+
+The first model, $\tilde{Z}_t=a_t+0.5a_{t-1}+0.24a_{t-2}=(1+0.5B+0.24B^2)a_t$, is an MA(2) and so is automatically stationary. It is also invertible, since it's roots are $\frac{-0.5 \pm \sqrt{0.5^2-4(0.24)(1)}}{2(0.24)}$ or $\frac{-0.5 \pm i\sqrt{0.71}}{0.48}=\frac{-0.5}{0.48} \pm \frac{\sqrt{0.71}}{0.48}i$, and the complex modulus of this is $\sqrt{\left(\frac{-0.5}{0.48}\right)^2 + \left(\frac{\sqrt{0.71}}{0.48}\right)^2}$ or better yet $\sqrt{\frac{0.25}{0.48^2} + \frac{0.71}{0.48^2}}$. The numerator of the second term in the square root is larger than its denominator, so the entire value in the square root is greater than one and thus the entire expression is greater than one.
+\vspace{\baselineskip}
+
+The second model, $\tilde{Z}_t=0.8Z_{t-1}+a_t-0.3a_{t-1} \implies (1-0.8B)\tilde{Z}_t=(1-0.3B)a_t$, is both stationary and invertible since the roots of $\pi(B)$ and $\psi(B)$ both lie inside the unit circle. To see this, see that the constant in both functions is 1, and the coefficient to the B terms being subtracted are both below 1 (so the root must be above 1).
+
+
+
+
+\newpage
+\textbf{\boldmath{i. Determine theoretical autocorrelations (the true model values) $\rho_1, \rho_2, \text{ and } \rho_3$ as well as partial autocorrelations $\phi_{11}, \phi_{22}, \text{ and } \phi_{33}$ for each of the two models.}}
+\vspace{\baselineskip}
+
+The covariance function for the MA(2) is given by:
+
+\vspace{-0.5cm}
+\begin{align*}
+	\gamma_1&=\E(\tilde{Z}_{t}\tilde{Z}_{t-1}) &&\text{Definition}\\
+	&=\E\left(\left(a_t+0.5a_{t-1}+0.24a_{t-2}\right)\left(a_{t-1}+0.5a_{t-2}+0.24a_{t-3}\right)\right) &&\text{Substitution}\\
+	&=\E(0.5a_{t-1}^2+(0.24)(0.5)a_{t-2}^2) &&\text{Ignore off diagonal terms}\\
+	&=0.5\sigma_a^2+0.12\sigma_a^2 &&\text{Expectations are linear}
+\end{align*}
+
+and	$\gamma_2=\E\left(\left(a_t+0.5a_{t-1}+0.24a_{t-2}\right)\left(a_{t-2}+0.5a_{t-3}+0.24a_{t-4}\right)\right)=\E(0.24a_{t-2}^2)=0.24\sigma_a^2$. Note that we can ignore the off-diagonal terms since $\E(a_t a_{t+k})=0$ when $k \neq 0$ by the definition of white-noise. The variance of model is:
+
+\vspace{-0.5cm}
+\begin{align*}
+	\gamma_0=\V(\tilde{Z}_t)&=\V(a_t+0.5a_{t-1}+0.24a_{t-2}) &&\text{Substitution}\\
+	&=\V(a_t)+0.5^2\V(a_{t-1})+0.24^2\V(a_{t-1}) &&\text{No covariance between terms}\\
+	&=\sigma_a^2(1+0.5^2+0.24^2) &&\text{Constant variance assumption}
+\end{align*}
+
+In general, the autocorrelations at lag $k$ are $\rho_{k}=\frac{\gamma_k}{\gamma_0}$ and thus $\rho_1=\frac{0.5\sigma_a^2+0.12\sigma_a^2}{\sigma_a^2(1+0.5^2+0.24^2)}\approx 0.47$, $\rho_2=\frac{0.24\sigma_a^2}{\sigma_a^2(1+0.5^2+0.24^2)}\approx0.18$, and, since the process is an MA(2), $\rho_3=0$.
+\vspace{\baselineskip}
+
+In general, we can compute the partial autocorrelations as $\phi_{k,k}=\frac{\left|\mymatrix{
+		1 & \rho_1 & \cdots & \rho_{k-2} & \rho_1 \\
+		\rho_1 & 1 & \cdots & \rho_{k-3} & \rho_2\\
+		\vdots & \vdots & \cdots & \ddots & \vdots\\
+		\rho_{k-1} & \rho_{k-2} & \cdots & \rho_1 & \rho_k
+	}\right|}{\left|\mymatrix{
+		1 & \rho_1 & \cdots & \rho_{k-2} & \rho_{k-1} \\
+		\rho_1 & 1 & \cdots & \rho_{k-3} & \rho_{k-2}\\
+		\vdots & \vdots & \cdots & \ddots & \vdots\\
+		\rho_{k-1} & \rho_{k-2} & \cdots & \rho_1 & 1
+	}\right|}$.
+
+Here, we have:
+
+\vspace{-0.5cm}
+\begin{align*}
+	\phi_{1,1}&=\rho_1\approx 0.47\\
+	\phi_{2,2}&=\frac{\left|\mymatrix{1 & \rho_1\\
+			\rho_1 &\rho_2}\right|}{\left|\mymatrix{1 & \rho_1\\
+			\rho_1 &1}\right|}=\frac{\rho_2-\rho_1^2}{1-\rho_1^2}\approx \frac{0.18-(0.47^2)}{1-0.47^2}\approx -0.05\\
+	\phi_{3,3}&=\frac{\left|\mymatrix{
+				 1 & \rho_1 & \rho_1\\
+			\rho_1 &      1 & \rho_2\\
+			\rho_2 & \rho_1 & \rho_3} \right|}{\left|\mymatrix{
+				 1 & \rho_1 & \rho_2\\
+			\rho_1 &      1 & \rho_1\\
+			\rho_2 & \rho_1 & 1
+	}\right|}=\frac{(1)(\rho_3-\rho_1\rho_2)-(\rho_1)(\rho_1\rho_3-\rho_2^2)+(\rho_1)(\rho_1^2-\rho_2)}{(1)(1-\rho_1^2)-(\rho_1)(\rho_1-\rho_1\rho_2)+(\rho_2)(\rho_1^2-\rho_2)}\approx  -0.09
+\end{align*}
+
+
+We can double check our calculations with the below:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=10cm]{MA Theoretical ACF}
+\end{figure}
+
+We compute the theoretical autocovariance of the ARMA(1,1) as follows:
+
+\vspace{-0.5cm}
+\begin{align*}
+	\gamma_k&=\E(\tilde{Z}_t\tilde{Z}_{t-k}) &&\text{Definition}\\
+	&=\E\left(0.8\tilde{Z}_{t-1}\tilde{Z}_{t-k}+\tilde{Z}_{t-k}a_t-0.3\tilde{Z}_{t-k}a_{t-1}\right) &&\text{Multiplying through by $\tilde{Z}_{t-k}$}\\
+	&=0.8\E(\tilde{Z}_{t-1}\tilde{Z}_{t-k})+\E(\tilde{Z}_{t-k}a_t)-0.3\E(\tilde{Z}_{t-k}a_{t-1}) &&\text{Expectations are linear}\\
+	&=\begin{cases}
+		0.8\gamma_0-0.3\sigma_a^2, &\text{$k=1$}\\
+		0.8\gamma_1, &\text{$k=2$}\\
+		0.8\gamma_2, &k=3
+	\end{cases} &&\text{Properties of white noise}
+\end{align*}
+
+We can compute the variance as follows:
+
+\vspace{-0.5cm}
+\begin{align*}
+	\V(\tilde{Z}_t)&=\V\left(0.8\tilde{Z}_{t-1}+a_t-0.3a_{t-1}\right) &&\text{Substitution}\\
+	&=0.8^2\V(\tilde{Z}_{t-1})+\sigma_a^2+0.3^2\sigma_a^2+2\left((0.8)(-0.3)\sigma_a^2)\right)\\
+	&=\frac{(1+0.3^2-0.48)\sigma_a^2}{1-0.8^2}=\frac{0.61\sigma_a^2}{0.36} &&\text{Weak Stationarity}
+\end{align*}
+
+On the second line, we use the general formula for the variance of a linear combination, $\V\left(\sum\limits_{i=1}^{n}c_iX_i\right)=\sum\limits_{i=1}^{n}c_i\V(X_i)+2\sum\limits_{i=1}^{n}\sum\limits_{j: j>i}^{n}c_ic_j\text{Cov}(X_i, X_j)$, and the observation that the covariance between the other two random variables in the double sum are zero by the properties of white-noise.
+\vspace{\baselineskip}
+
+The autocorrelations are $\rho_1=\frac{\gamma_k}{\gamma_0}$, so $\rho_1=\frac{0.8\left(\frac{0.61\sigma_a^2}{0.36}\right)-0.3\sigma_a^2}{\frac{0.61\sigma_a^2}{0.36}}=0.8-\frac{0.3\cdot 0.36}{.61}\approx0.62$, $\rho_2\approx 0.8(0.62) \approx 0.50$, and $\rho_3\approx 0.8(0.5) \approx 0.4$.
+\vspace{\baselineskip}
+
+To find the partial autocorrelations, we use the same process as before:
+
+\vspace{-0.5cm}
+\begin{align*}
+	\phi_{1,1}&=\rho_1\approx 0.62\\
+	\phi_{2,2}&=\frac{\left|\mymatrix{1 & \rho_1\\
+			\rho_1 &\rho_2}\right|}{\left|\mymatrix{1 & \rho_1\\
+			\rho_1 &1}\right|}=\frac{\rho_2-\rho_1^2}{1-\rho_1^2}\approx \frac{0.5-(0.62^2)}{1-0.62^2}\approx 0.18\\
+	\phi_{3,3}&=\frac{\left|\mymatrix{
+			1 & \rho_1 & \rho_1\\
+			\rho_1 &      1 & \rho_2\\
+			\rho_2 & \rho_1 & \rho_3} \right|}{\left|\mymatrix{
+			1 & \rho_1 & \rho_2\\
+			\rho_1 &      1 & \rho_1\\
+			\rho_2 & \rho_1 & 1
+		}\right|}=\frac{(1)(\rho_3-\rho_1\rho_2)-(\rho_1)(\rho_1\rho_3-\rho_2^2)+(\rho_1)(\rho_1^2-\rho_2)}{(1)(1-\rho_1^2)-(\rho_1)(\rho_1-\rho_1\rho_2)+(\rho_2)(\rho_1^2-\rho_2)}\approx  0.05
+\end{align*}
+
+We verify our calculations with the below:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm]{ARMA Theoretical ACF}
+\end{figure}
+
+
+
+
+
+\newpage
+\textbf{\boldmath{ii. Discuss what you observe as far as the proximity of the estimated autocorrelations values to the true values.}}
+\vspace{\baselineskip}
+
+We see that with an increased sample, the estimated ACF moves closer to the theoretical ACF. The comparison between the two models at the two different sample sizes are shown below.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm]{ACF Comparison}
+\end{figure}
+
+
+
+\newpage
+\noindent\textbf{\boldmath{2) Let $\tilde{Z_t}=0.4\tilde{Z}_{t-1}+0.21\tilde{Z}_{t-2}+a_t+0.7a_{t-1}+0.12a_{t-2}$. Is the model in its reduced form? If not, write the model in reduced form.}}
+\vspace{\baselineskip}
+
+The above model can be written as $\tilde{Z_t}-0.4\tilde{Z}_{t-1}-0.21\tilde{Z}_{t-2}=a_t+0.7a_{t-1}+0.12a_{t-2}$ or equivalently $\left(1-0.4B-0.21B^2\right)\tilde{Z_t}=\left(1+0.7B+0.12B^2\right)a_t$.
+\vspace{\baselineskip}
+
+We can compute the roots of $\pi(B)=(1-0.4B-0.21B^2)$ as:
+
+\vspace{-0.5cm}
+\begin{align*}
+	\frac{-(-0.4) \pm \sqrt{(-0.4^2)-4(-0.21)(1)}}{2(-0.21)}=\frac{0.4 \pm i\sqrt{0.68}}{-0.42}
+\end{align*}
+ 
+And the roots of $\psi(B)=(1+0.7B+0.12B^2)$ as:
+
+\vspace{-0.5cm}
+\begin{align*}
+	\frac{-(0.7) \pm \sqrt{(0.7^2)-4(0.12)(1)}}{2(.12)}=\frac{-0.7 \pm \sqrt{.01}}{0.24}=\frac{\frac{-7}{10} \pm \frac{1}{10}}{0.24}=\left(\frac{-5}{2}, \frac{-10}{3}\right)
+\end{align*} 
+ 
+In general, we can tell if a model is in reduced form if there are no common roots in the $\psi(B)$ and $\pi(B)$ polynomials. Since the constants in both functions above are 1, the roots completely determine the factoring. And by the above, there are no common roots, and therefore no common factors; the model is in reduced form. 
+\vspace{\baselineskip} 
+
+
+
+\noindent\textbf{\boldmath{3) For the following two time series models, determine if $W_t=(1-B)\tilde{Z_t}$ is stationary and if it is invertible. $(1-B)\tilde{Z_t}=a_t-a_{t-1}$ and $(1-B)^2\tilde{Z_t}=a_t-0.81a_{t-1}+0.38a_{t-2}$.}}
+\vspace{\baselineskip}
+
+The first model is $W_t=(1-B)\tilde{Z}_t=a_t-a_{t-1}$, which can be written $W_t=\psi(B)a_t=(1-B)a_t$. This is an MA(2), and since all finite MA processes are stationary, $W_t$ is stationary. The process is invertible if the roots of $\psi(B)$ lie outside the unit circle. Since the root is 1, the process is not invertible.
+\vspace{\baselineskip}
+
+The second model is $W_t=(1-B)\tilde{Z}_t=\left(a_t-0.81a_{t-1}+0.38a_{t-2}\right)(1-B)^{-1}$ which can be written $W_t=\psi(B)a_t=\frac{(1-0.81B+0.38B^2)}{(1-B)}a_t$. The denominator has a root of 1, so $\psi(B)$ is infinite in extent and fails to be absolutely summable; $W_t$ is non-stationary. The function $\psi(B)$ has a root at $B=x$ if and only if the numerator of the function has a root at the same $B=x$. So we can use the quadratic formula and identify the roots as $\frac{0.81 \pm \sqrt{0.81^2-4(.38)(1)}}{2(.38)}=\frac{0.81 \pm i\sqrt{0.8639}}{0.76}$. The complex modulus is then $\sqrt{\left(\frac{0.81}{0.76}\right)^2+\left(\frac{.8639}{0.76^2}\right)} > \sqrt{\frac{.8639}{0.76^2}} > 1$, and so the process is invertible.
+
+
+\newpage
+\section{Appendix}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=15cm]{R Code1}
+\end{figure}
+\vspace{-1cm}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=15cm]{R Code2}
+\end{figure}
+\vspace{-1cm}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=15cm]{R Code3}
+\end{figure}
+\vspace{-1cm}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=15cm]{R Code4}
+\end{figure}
+\vspace{-1cm}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=15cm]{R Code5}
+\end{figure}
+\vspace{-1cm}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=15cm]{R Code6}
+\end{figure}
+\vspace{-1cm}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=15cm]{R Code7}
+\end{figure}
+
+
+\end{document}
